@@ -1,0 +1,95 @@
+<script type='text/javascript'>
+	var googletag = window.googletag || {};
+    googletag.cmd = googletag.cmd || [];
+	googletag.cmd.unshift(function() {      
+	  var dfp_sb = '/75037320/speurders.nl/';
+
+      var nm_adzone = '',
+          loc = document.location,
+            nm_url = loc.protocol + '/'+'/' + loc.hostname + loc.pathname,
+            nm_width = document.documentElement.clientWidth,
+            nm_wbb = [[300, 50],[300, 100],[300, 250],[320, 50],[320, 100],[320, 240]],
+            nm_btf = [],
+            nm_whpa = [[300, 50],[320, 50]],
+            nm_lbmid = [[728, 90]],
+            nm_lbph = [[728, 90]],
+            nm_recatf = [[300, 250]];
+        if (nm_width >= 980) {
+            nm_wbb = [[728, 90]];
+            nm_recatf = [[300, 250]];
+            nm_lbmid = [[728, 90]];
+            nm_lbtf = [[728, 90]];
+            nm_whpa = [[120,600],[160,600],[300, 250],[300, 600]];
+            nm_list = ['fluid', [634, 145]];
+        } else if (nm_width >= 738) {
+            nm_wbb = [[728, 90]];
+            nm_recatf = [[300, 250]];
+            nm_lbmid = [[728, 90]];
+            nm_lbtf = [[728, 90]];
+            nm_whpa = [[120,600],[160,600],[300, 250],[300, 600]];
+            nm_list = ['fluid', [634, 145]];
+        }
+// start newstyle dfp
+//      var nm_adzone = '';
+      switch ('{{endpoint}}') {
+        case 'generic.home':
+	        nm_adzone = 'homepage';
+          break;
+        case 'generic.category':
+	        nm_adzone = 'overzicht';
+          break;
+        case 'generic.user':
+        case 'generic.browse':
+//          if (speurders.keywords != "") {
+//            nm_adzone = 'zoekresultaten';
+//          }
+//          else {
+            nm_adzone = 'overzicht';
+//          }
+          break;
+        case 'generic.ad':
+          nm_adzone = 'advertentie';
+          break;
+      }
+//      console.log("setting adzone "+nm_adzone);
+// end newstyle dfp
+      
+        if(typeof nm_adzone == 'undefined'){nm_adzone = 'default';}
+
+       var slots=[
+         // iab
+         [nm_wbb, 'nm_billboard', 'atf'],
+         [nm_whpa,'nm_halfpage', 'mid'],
+         [nm_recatf, 'nm_rectangleatf', 'atf'],
+         [nm_lbmid, 'nm_leadbmid', 'mid'],
+         [nm_lbtf, 'nm_leadbtf', 'btf'],
+         [nm_lbph, 'nm_lbphoto', 'mid'],
+         // listingads
+         [nm_list, 'nm_listatf', 'btf'],
+         [nm_list, 'nm_listmid', 'mid'],
+         [nm_list, 'nm_listbtf', 'btf'],
+         // oop
+         ['nm_oop'],
+         // targeting
+         ['url', nm_url]
+      ];
+
+  slots.forEach(function(slot) {
+   switch (slot.length) {
+    case 3:
+    gptASO[slot[1]] = googletag.defineSlot(dfp_sb+nm_adzone, slot[0], slot[1]).addService(googletag.pubads()).setTargeting('pos', slot[2]);
+         //googletag.display("'"+slot[1]+"'");
+       //console.log(slot[1]);
+     break;
+    case 2:
+     googletag.pubads().setTargeting(slot[0], slot[1]);
+     break;
+    case 1:
+     gptASO['nm_oop'] = googletag.defineOutOfPageSlot(dfp_sb+nm_adzone, slot[0]).addService(googletag.pubads());
+       //googletag.display("'"+slot[0]+"'");
+     break;
+   }
+  });
+      googletag.enableServices();
+    });
+</script>
