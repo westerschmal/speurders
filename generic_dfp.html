@@ -1,0 +1,131 @@
+<script type='text/javascript'>
+// depends on hideLog / showLog functions in template in Admin  
+  
+function readCookie(name) {
+    var nameEQ = encodeURIComponent(name) + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+    }
+    return null;
+}
+  
+
+function spnlog(message,color) {
+  if (readCookie("showLog") == "e") {
+    console.log('%cSPNL' + '%c ' + message, 'background: #fecc3e; color: #000', color);
+  }
+}
+  
+spnlog("ℹ️ Generic DFP - head init");
+  
+var gptASO = [];
+  
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+(function() {
+	var gads = document.createElement('script');
+    gads.async = true;
+    gads.type = 'text/javascript';
+    var useSSL = 'https:' == document.location.protocol;
+    gads.src = (useSSL ? 'https:' : 'http:') + '//www.googletagservices.com/tag/js/gpt.js';
+    var node = document.getElementsByTagName('script')[0];
+    node.parentNode.insertBefore(gads, node);
+})();
+  
+// generic stuff to push
+  
+	googletag.cmd.unshift(function() {
+// newstyle adzone + key/val targeting
+	// define
+      var nm_maincat = ('{{main_category_slug}}' == 'undefined') ? '' : '{{main_category_slug}}';
+      var nm_subcat = ('{{category_slug}}' == 'undefined') ? '' : '{{category_slug}}';
+    // set
+      googletag.pubads().setTargeting('rubriek', nm_maincat).setTargeting('subrubriek', nm_subcat);
+      spnlog("✅ Setting rubriek targeting: " + nm_maincat);
+      spnlog("✅ Setting subrubriek targeting: " + nm_subcat);
+      
+// set cookies, or not
+  	var disablecookies = 1;
+	if ('{{cookie consent cookie}}' == true) {     
+		disablecookies = 0;
+        
+        // start KRUX interchange
+        // check if Krux is available: if not, ignore targeting, otherwise it causes errors on Chrome, and crashes on Safari - in both cases not working for ad visibility optimization
+//        if (typeof Krux !== "undefined"){
+//          spnlog("Setting Krux targeting");
+//          googletag.pubads().setTargeting('ksg', Krux.segments);
+//		  googletag.pubads().setTargeting('kuid', Krux.user);
+//        }
+//        else {
+//        	spnlog("Krux not availabe at this time, not setting targeting");
+//        }
+        // end KRUX interchange
+        
+        // start cxense
+        if (typeof cX !== "undefined"){
+            spnlog("✅ Setting Cxense targeting");
+            googletag.pubads().setTargeting('tmg_cxense', cX.getLocalSegments());
+          
+          	spnlog("✅ Setting Enreach targeting");
+	        googletag.pubads().setTargeting('evid', cX.getLocalEnreachId());
+            }
+        else {
+          spnlog("⚠️ Cxense not availabe at this time, not setting Cxense and Enreach targeting" ,'background: #fff; color: red');
+        }
+        // end cxense
+      }
+      else {
+		spnlog("⚠️ No consent found, so not setting any cookies right now");
+      }
+      googletag.pubads().setCookieOptions(disablecookies);
+      googletag.pubads().setRequestNonPersonalizedAds(disablecookies);
+   
+	if (speurders.main_category_slug == "contacten") {
+      googletag.pubads().setTargeting('allow_adx', 'false');
+      spnlog("Do not allow Adx in this maincat");
+    }
+
+   // START eventlisteners
+   // only when logging is on for possible lagging
+   if (readCookie("showLog") == "e") {
+       // debug slot render ended - SlotRenderEnded
+		googletag.pubads().addEventListener('slotRenderEnded', function(event) {  spnlog('✅ Slot with elementid: ' + event.slot.getSlotElementId() + ' was rendered. Creative with id: ' + event.creativeId + ' is rendered to slot of size: ' + event.size[0] + 'x' + event.size[1],'background: #fff; color: orange');      });
+      
+      // debug slot loaded - SlotOnload
+		googletag.pubads().addEventListener('slotOnload', function(event) {  spnlog('✅ Slot with elementid: ' + event.slot.getSlotElementId() + ' was loaded','background: #fff; color: green');      });
+      
+	  // debug slot Impression Viewable event - ImpressionViewable
+		googletag.pubads().addEventListener('impressionViewable', function(event) {  spnlog('✅ Slot with elementid: ' + event.slot.getSlotElementId() + ' is now considered a viewable impression ','background: #fff; color: green','background: #fff; color: green');      });
+      
+      // debug slot visibility change - SlotVisibilityChanged
+		googletag.pubads().addEventListener('slotVisibilityChanged', function(event) {
+  			// ignore nm_oop as this is only the pixel its being fired from (bottom of page)
+  			if (event.slot.getSlotElementId() != 'nm_oop') {
+    			spnlog('ℹ️ Slot with elementid: ' + event.slot.getSlotElementId() + ' changed visibility to: ' + event.inViewPercentage + '%','background: #fff; color: blue');     
+  			}
+		});
+   }
+   // END eventlisteners
+         
+	// googletag.pubads().enableSingleRequest(); // doesn't work well for Safari?
+	googletag.pubads().collapseEmptyDivs();
+      
+	// lazyload, requires to stop initial loading of ads
+	googletag.pubads().disableInitialLoad();
+      
+    document.addEventListener('lazybeforeunveil', function(e){
+    var aso = e.target.getAttribute('id');
+   	 if(aso){
+       if (aso != "nm_oop"){
+      googletag.cmd.push(function () {
+        spnlog('ℹ️ Slot with elementid: ' + aso + ' will now start lazyloading (refresh)','background: #fff; color: green');
+       googletag.pubads().refresh([gptASO[aso]]);
+      });
+      }
+     }
+	});    
+});
+</script>
