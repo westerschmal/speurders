@@ -111,10 +111,10 @@ googletag.cmd = googletag.cmd || [];
    // END eventlisteners
          
 	// googletag.pubads().enableSingleRequest(); // doesn't work well for Safari?
-	googletag.pubads().collapseEmptyDivs();
+	//googletag.pubads().collapseEmptyDivs();
       
 	// lazyload, requires to stop initial loading of ads
-	googletag.pubads().disableInitialLoad();
+	//googletag.pubads().disableInitialLoad();
       
     document.addEventListener('lazybeforeunveil', function(e){
     var aso = e.target.getAttribute('id');
