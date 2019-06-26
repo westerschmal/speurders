@@ -1,6 +1,10 @@
 <script type='text/javascript'>
 	var googletag = window.googletag || {};
-    googletag.cmd = googletag.cmd || [];
+	    googletag.cmd = googletag.cmd || [];
+	    googletag.cmd.push(function () {
+	  googletag.pubads().disableInitialLoad();
+	  googletag.pubads().collapseEmptyDivs();
+	})
 	googletag.cmd.unshift(function() {      
 	  var dfp_sb = '/75037320/speurders.nl/';
 
